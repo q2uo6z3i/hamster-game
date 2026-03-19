@@ -3,133 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ハムスターお世話ゲーム（改良版）</title>
+<title>ハムスターお世話ゲーム（画面切替）</title>
 <style>
 body { font-family: sans-serif; text-align: center; background: #fff4e6; }
 h1 { background: #f7c59f; padding: 10px; }
+.hidden { display:none; }
 
-/* ハムスター（CSSで顔） */
 #hamster {
-  width: 150px;
-  height: 150px;
-  background: #f5c6a5;
-  border-radius: 50%;
-  margin: 20px auto;
-  position: relative;
+  width: 150px; height:150px; background:#f5c6a5; border-radius:50%; margin:20px auto; position:relative;
 }
-.eye {
-  width: 15px; height: 15px; background: black; border-radius: 50%;
-  position: absolute; top: 50px;
-}
-#eye1 { left: 40px; }
-#eye2 { right: 40px; }
-#mouth {
-  width: 40px; height: 20px;
-  border-bottom: 4px solid black;
-  border-radius: 0 0 40px 40px;
-  position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-}
+.eye { width:15px; height:15px; background:black; border-radius:50%; position:absolute; top:50px; }
+#eye1{ left:40px;} #eye2{ right:40px;}
+#mouth { width:40px;height:20px; position:absolute; bottom:40px; left:50%; transform:translateX(-50%); border-bottom:4px solid black; }
 
-.status { margin: 10px; }
-.bar { width: 200px; height: 20px; background: #ddd; margin: 5px auto; border-radius: 10px; overflow: hidden; }
-.fill { height: 100%; background: #2a9d8f; width: 50%; }
-button { margin: 5px; padding: 10px 15px; border: none; border-radius: 10px; background: #f4a261; color: white; cursor: pointer; }
-button:hover { background: #e76f51; }
-#gameArea { margin-top: 20px; }
+.bar { width:200px;height:20px;background:#ddd;margin:5px auto;border-radius:10px;overflow:hidden; }
+.fill{ height:100%; background:#2a9d8f; width:50%; }
+button{ margin:5px;padding:10px 15px;border:none;border-radius:10px;background:#f4a261;color:white;cursor:pointer; }
+
+#walkGameArea{
+  width:300px;height:200px;margin:20px auto;background:#cdeffd;position:relative;overflow:hidden;border-radius:10px;
+}
+#player{
+  width:30px;height:30px;background:#ff8c42;border-radius:50%;position:absolute;bottom:10px;left:20px;
+}
+.obstacle{
+  width:20px;height:40px;background:#444;position:absolute;bottom:0;
+}
 </style>
 </head>
 <body>
 
 <h1>🐹 ハムスターお世話ゲーム 🐹</h1>
 
-<div id="hamster">
-  <div id="eye1" class="eye"></div>
-  <div id="eye2" class="eye"></div>
-  <div id="mouth"></div>
+<!-- メイン画面 -->
+<div id="main">
+  <div id="hamster">
+    <div id="eye1" class="eye"></div>
+    <div id="eye2" class="eye"></div>
+    <div id="mouth"></div>
+  </div>
+
+  <div>おなか<div class="bar"><div id="hunger" class="fill"></div></div></div>
+  <div>きれいさ<div class="bar"><div id="clean" class="fill"></div></div></div>
+  <div>たのしさ<div class="bar"><div id="fun" class="fill"></div></div></div>
+
+  <button onclick="startWalk()">散歩</button>
 </div>
 
-<div class="status">おなか<div class="bar"><div id="hunger" class="fill"></div></div></div>
-<div class="status">きれいさ<div class="bar"><div id="clean" class="fill"></div></div></div>
-<div class="status">たのしさ<div class="bar"><div id="fun" class="fill"></div></div></div>
-
-<button onclick="startFeedGame()">餌やり</button>
-<button onclick="startCleanGame()">掃除</button>
-<button onclick="startWalkGame()">散歩</button>
-
-<div id="gameArea"></div>
-<p id="message"></p>
+<!-- 散歩ゲーム画面 -->
+<div id="walk" class="hidden">
+  <h2>散歩ゲーム（ジャンプで障害物をよけろ！）</h2>
+  <div id="walkGameArea">
+    <div id="player"></div>
+  </div>
+  <p>クリックでジャンプ！</p>
+  <button onclick="endWalk()">戻る</button>
+</div>
 
 <script>
 let hunger=50, clean=50, fun=50;
+let jumping=false;
 
-function update() {
-  document.getElementById("hunger").style.width = hunger + "%";
-  document.getElementById("clean").style.width = clean + "%";
-  document.getElementById("fun").style.width = fun + "%";
+function update(){
+  document.getElementById("hunger").style.width=hunger+"%";
+  document.getElementById("clean").style.width=clean+"%";
+  document.getElementById("fun").style.width=fun+"%";
 
-  const mouth = document.getElementById("mouth");
-
-  if (hunger>70 && clean>70 && fun>70) {
-    mouth.style.borderBottom = "4px solid black"; // ニコ
-    mouth.style.borderRadius = "0 0 40px 40px";
-  } else if (hunger<30 || clean<30 || fun<30) {
-    mouth.style.borderBottom = "none";
-    mouth.style.borderTop = "4px solid black"; // 悲しい
-    mouth.style.borderRadius = "40px 40px 0 0";
-  } else {
-    mouth.style.borderBottom = "4px solid black"; // 普通
-    mouth.style.borderRadius = "0";
+  const mouth=document.getElementById("mouth");
+  if(hunger>70 && clean>70 && fun>70){
+    mouth.style.borderBottom="4px solid black";
+    mouth.style.borderTop="none";
+  }else if(hunger<30 || clean<30 || fun<30){
+    mouth.style.borderBottom="none";
+    mouth.style.borderTop="4px solid black";
+  }else{
+    mouth.style.borderTop="none";
+    mouth.style.borderBottom="2px solid black";
   }
 }
 
-/* 餌やり：動くボタン当て */
-function startFeedGame(){
-  let area=document.getElementById("gameArea");
-  area.innerHTML="<p>動くボタンをクリック！</p><button id='foodBtn' style='position:relative'>餌</button>";
-  let btn=document.getElementById("foodBtn");
-  let move=setInterval(()=>{
-    btn.style.left=Math.random()*200-100+"px";
-  },300);
-  btn.onclick=()=>{
-    clearInterval(move);
-    hunger+=30;
-    document.getElementById("message").textContent="成功！";
-    area.innerHTML="";
-    update();
-  };
+function startWalk(){
+  document.getElementById("main").classList.add("hidden");
+  document.getElementById("walk").classList.remove("hidden");
+  startGame();
 }
 
-/* 掃除：制限時間連打 */
-function startCleanGame(){
-  let count=0;
-  let area=document.getElementById("gameArea");
-  area.innerHTML="<p>3秒で10回クリック！</p><button onclick='clickClean()'>掃除</button>";
-  window.clickClean=()=>{ count++; };
-  setTimeout(()=>{
-    if(count>=10){ clean+=30; document.getElementById("message").textContent="成功！"; }
-    else document.getElementById("message").textContent="失敗…";
-    area.innerHTML="";
-    update();
-  },3000);
+function endWalk(){
+  document.getElementById("walk").classList.add("hidden");
+  document.getElementById("main").classList.remove("hidden");
 }
 
-/* 散歩：反応速度ゲーム */
-function startWalkGame(){
-  let area=document.getElementById("gameArea");
-  area.innerHTML="<p>『今！』が出たらクリック！</p><button id='walkBtn'>待機</button>";
-  let btn=document.getElementById("walkBtn");
-  let ready=false;
-  setTimeout(()=>{
-    btn.textContent="今！";
-    ready=true;
-  },Math.random()*2000+1000);
+// 散歩ゲーム（横スクロールジャンプ）
+function startGame(){
+  const area=document.getElementById("walkGameArea");
+  const player=document.getElementById("player");
 
-  btn.onclick=()=>{
-    if(ready){ fun+=30; document.getElementById("message").textContent="成功！"; }
-    else document.getElementById("message").textContent="早すぎ！";
-    area.innerHTML="";
+  area.onclick=()=>jump(player);
+
+  let obstacle=setInterval(()=>{
+    let obs=document.createElement("div");
+    obs.classList.add("obstacle");
+    obs.style.left="300px";
+    area.appendChild(obs);
+
+    let move=setInterval(()=>{
+      let x=parseInt(obs.style.left);
+      obs.style.left=(x-5)+"px";
+
+      // 当たり判定
+      let playerTop=player.offsetTop;
+      if(x<50 && x>20 && playerTop>140){
+        clearInterval(move);
+        clearInterval(obstacle);
+        alert("ぶつかった！散歩失敗");
+        area.innerHTML='<div id="player"></div>';
+      }
+
+      if(x<0){
+        obs.remove();
+      }
+    },30);
+
+  },1500);
+
+  // 一定時間で成功
+  setTimeout(()=>{
+    clearInterval(obstacle);
+    fun+=40;
+    alert("散歩成功！楽しかった！");
+    endWalk();
     update();
-  };
+  },8000);
+}
+
+function jump(player){
+  if(jumping) return;
+  jumping=true;
+  let height=0;
+
+  let up=setInterval(()=>{
+    if(height>=80){ clearInterval(up);
+      let down=setInterval(()=>{
+        if(height<=0){ clearInterval(down); jumping=false; }
+        height-=5;
+        player.style.bottom=10+height+"px";
+      },20);
+    }
+    height+=5;
+    player.style.bottom=10+height+"px";
+  },20);
 }
 
 function decrease(){ hunger-=1; clean-=1; fun-=1; update(); }
