@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ハムスターお世話ゲーム（ミニゲーム付き）</title>
+<style>
+body { font-family: sans-serif; text-align: center; background: #fff4e6; }
+h1 { background: #f7c59f; padding: 10px; }
+#hamster { font-size: 80px; margin: 20px; transition: 0.3s; }
+.status { margin: 10px; }
+button { margin: 5px; padding: 10px 15px; border: none; border-radius: 10px; background: #f4a261; color: white; cursor: pointer; }
+button:hover { background: #e76f51; }
+.bar { width: 200px; height: 20px; background: #ddd; margin: 5px auto; border-radius: 10px; overflow: hidden; }
+.fill { height: 100%; background: #2a9d8f; width: 50%; }
+#gameArea { margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>🐹 ハムスターお世話ゲーム 🐹</h1>
+<div id="hamster">😐</div>
+
+<div class="status">おなか<div class="bar"><div id="hunger" class="fill"></div></div></div>
+<div class="status">きれいさ<div class="bar"><div id="clean" class="fill"></div></div></div>
+<div class="status">たのしさ<div class="bar"><div id="fun" class="fill"></div></div></div>
+
+<button onclick="startFeedGame()">餌やり</button>
+<button onclick="startCleanGame()">掃除</button>
+<button onclick="startWalkGame()">散歩</button>
+
+<div id="gameArea"></div>
+<p id="message"></p>
+
+<script>
+let hunger = 50, clean = 50, fun = 50;
+
+function update() {
+  hunger = Math.max(0, Math.min(100, hunger));
+  clean = Math.max(0, Math.min(100, clean));
+  fun = Math.max(0, Math.min(100, fun));
+
+  document.getElementById("hunger").style.width = hunger + "%";
+  document.getElementById("clean").style.width = clean + "%";
+  document.getElementById("fun").style.width = fun + "%";
+
+  const hamster = document.getElementById("hamster");
+  if (hunger > 70 && clean > 70 && fun > 70) hamster.textContent = "😊";
+  else if (hunger < 30 || clean < 30 || fun < 30) hamster.textContent = "😢";
+  else hamster.textContent = "😐";
+}
+
+// 餌やりゲーム（タイミング）
+function startFeedGame() {
+  const area = document.getElementById("gameArea");
+  area.innerHTML = "<p>ボタンをちょうどいいタイミングで押せ！</p><button onclick='feedGame()'>STOP</button>";
+  window.feedValue = Math.random();
+}
+function feedGame() {
+  if (window.feedValue > 0.4 && window.feedValue < 0.6) {
+    hunger += 30;
+    document.getElementById("message").textContent = "成功！たくさん食べた！";
+  } else {
+    document.getElementById("message").textContent = "失敗…";
+  }
+  document.getElementById("gameArea").innerHTML = "";
+  update();
+}
+
+// 掃除ゲーム（連打）
+let cleanCount = 0;
+function startCleanGame() {
+  cleanCount = 0;
+  const area = document.getElementById("gameArea");
+  area.innerHTML = "<p>5回クリックしろ！</p><button onclick='cleanGame()'>掃除する</button>";
+}
+function cleanGame() {
+  cleanCount++;
+  if (cleanCount >= 5) {
+    clean += 30;
+    document.getElementById("message").textContent = "ピカピカ！";
+    document.getElementById("gameArea").innerHTML = "";
+    update();
+  }
+}
+
+// 散歩ゲーム（当てゲーム）
+function startWalkGame() {
+  const area = document.getElementById("gameArea");
+  area.innerHTML = "<p>1〜3を当てて！</p>\
+  <button onclick='walkGame(1)'>1</button>\
+  <button onclick='walkGame(2)'>2</button>\
+  <button onclick='walkGame(3)'>3</button>";
+  window.answer = Math.floor(Math.random()*3)+1;
+}
+function walkGame(n) {
+  if (n === window.answer) {
+    fun += 30;
+    document.getElementById("message").textContent = "大成功！楽しかった！";
+  } else {
+    document.getElementById("message").textContent = "はずれ…";
+  }
+  document.getElementById("gameArea").innerHTML = "";
+  update();
+}
+
+function decrease() {
+  hunger -= 2; clean -= 1; fun -= 2;
+  update();
+}
+
+setInterval(decrease, 1000);
+update();
+</script>
+
+</body>
+</html>
