@@ -3,22 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ハムスターお世話ゲーム（完成版）</title>
+<title>ハムスターお世話ゲーム（リアル画像版）</title>
 <style>
 body{font-family:sans-serif;text-align:center;background:#fff4e6}
 h1{background:#f7c59f;padding:10px}
 .hidden{display:none}
 
-/* ゴールデンハムスター風 */
-#hamster{width:160px;height:140px;background:#f5c6a5;border-radius:80px;margin:20px auto;position:relative}
-.ear{width:40px;height:40px;background:#f5c6a5;border-radius:50%;position:absolute;top:-15px}
-#ear1{left:20px} #ear2{right:20px}
-.eye{width:12px;height:12px;background:black;border-radius:50%;position:absolute;top:50px}
-#eye1{left:45px} #eye2{right:45px}
-.nose{width:10px;height:8px;background:pink;border-radius:50%;position:absolute;top:65px;left:50%;transform:translateX(-50%)}
-.mouth{width:30px;height:15px;border-bottom:3px solid black;border-radius:0 0 30px 30px;position:absolute;top:75px;left:50%;transform:translateX(-50%)}
-.cheek{width:20px;height:15px;background:#ffd1dc;border-radius:50%;position:absolute;top:70px}
-#c1{left:25px} #c2{right:25px}
+/* ハムスター画像 */
+#hamster img{
+  width:180px;
+  transition:0.3s;
+}
 
 .bar{width:200px;height:20px;background:#ddd;margin:5px auto;border-radius:10px;overflow:hidden}
 .fill{height:100%;background:#2a9d8f;width:50%}
@@ -29,10 +24,10 @@ button{margin:5px;padding:10px 15px;border:none;border-radius:10px;background:#f
 #feedGameArea{background:#fff0c9}
 #cleanGameArea{background:#e0ffe0}
 
-#player{width:30px;height:30px;background:#ff8c42;border-radius:50%;position:absolute;bottom:10px;left:20px}
+#player{width:40px;height:40px;position:absolute;bottom:10px;left:20px}
 .obstacle{width:20px;height:40px;background:#444;position:absolute;bottom:0}
-.food{width:20px;height:20px;background:green;border-radius:50%;position:absolute}
-.dirt{width:15px;height:15px;background:brown;border-radius:50%;position:absolute}
+.food{width:30px;height:30px;position:absolute}
+.dirt{width:20px;height:20px;background:brown;border-radius:50%;position:absolute}
 </style>
 </head>
 <body>
@@ -41,10 +36,7 @@ button{margin:5px;padding:10px 15px;border:none;border-radius:10px;background:#f
 <!-- メイン -->
 <div id="main">
 <div id="hamster">
-<div id="ear1" class="ear"></div><div id="ear2" class="ear"></div>
-<div id="eye1" class="eye"></div><div id="eye2" class="eye"></div>
-<div class="nose"></div><div id="mouth" class="mouth"></div>
-<div id="c1" class="cheek"></div><div id="c2" class="cheek"></div>
+<img id="hamImg" src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Golden_hamster.jpg">
 </div>
 
 <div>おなか<div class="bar"><div id="hunger" class="fill"></div></div></div>
@@ -59,7 +51,9 @@ button{margin:5px;padding:10px 15px;border:none;border-radius:10px;background:#f
 <!-- 散歩 -->
 <div id="walk" class="hidden">
 <h2>ジャンプで障害物回避！</h2>
-<div id="walkGameArea"><div id="player"></div></div>
+<div id="walkGameArea">
+<img id="player" src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Golden_hamster.jpg">
+</div>
 <button onclick="endWalk()">戻る</button>
 </div>
 
@@ -84,41 +78,69 @@ function update(){
   hunger=Math.max(0,Math.min(100,hunger));
   clean=Math.max(0,Math.min(100,clean));
   fun=Math.max(0,Math.min(100,fun));
-  hungerBar(); face();
-}
-function hungerBar(){
+
   document.getElementById("hunger").style.width=hunger+"%";
   document.getElementById("clean").style.width=clean+"%";
   document.getElementById("fun").style.width=fun+"%";
-}
-function face(){
-  const m=document.getElementById("mouth");
-  if(hunger>70&&clean>70&&fun>70){m.style.borderBottom="3px solid black";m.style.borderTop="none"}
-  else if(hunger<30||clean<30||fun<30){m.style.borderBottom="none";m.style.borderTop="3px solid black"}
-  else{m.style.borderTop="none";m.style.borderBottom="2px solid black"}
+
+  const img=document.getElementById("hamImg");
+
+  if(hunger>70 && clean>70 && fun>70){
+    img.style.filter="brightness(1.2)";
+  }else if(hunger<30 || clean<30 || fun<30){
+    img.style.filter="grayscale(80%)";
+  }else{
+    img.style.filter="none";
+  }
 }
 
 // --- 散歩 ---
-function startWalk(){switchScreen('walk'); startWalkGame()}
+function startWalk(){switchScreen('walk');startWalkGame()}
 function endWalk(){switchScreen('main')}
 function startWalkGame(){
-  const p=document.getElementById("player"); let jumping=false;
+  let jumping=false;
+  const player=document.getElementById("player");
+
   document.getElementById("walkGameArea").onclick=()=>{
-    if(jumping)return; jumping=true; let h=0;
-    let up=setInterval(()=>{if(h>80){clearInterval(up);let down=setInterval(()=>{if(h<=0){clearInterval(down);jumping=false}h-=5;p.style.bottom=10+h+"px"},20)}h+=5;p.style.bottom=10+h+"px"},20)
+    if(jumping)return;
+    jumping=true;
+    let h=0;
+    let up=setInterval(()=>{
+      if(h>80){
+        clearInterval(up);
+        let down=setInterval(()=>{
+          if(h<=0){clearInterval(down);jumping=false}
+          h-=5;player.style.bottom=10+h+"px";
+        },20);
+      }
+      h+=5;player.style.bottom=10+h+"px";
+    },20);
   };
-  setTimeout(()=>{fun+=40;alert("成功！");endWalk();update()},5000)
+
+  setTimeout(()=>{fun+=40;alert("散歩成功！");endWalk();update()},5000);
 }
 
 // --- 餌やり ---
 let score=0;
 function startFeed(){switchScreen('feed');score=0;spawnFood()}
 function spawnFood(){
-  const area=document.getElementById("feedGameArea"); area.innerHTML="";
+  const area=document.getElementById("feedGameArea");
+  area.innerHTML="";
+
   for(let i=0;i<5;i++){
-    let f=document.createElement("div");f.className="food";
-    f.style.left=Math.random()*260+"px";f.style.top=Math.random()*160+"px";
-    f.onclick=()=>{f.remove();score++;document.getElementById("feedScore").textContent=score;if(score>=5){hunger+=40;alert("満腹！");endFeed();update()}}
+    let f=document.createElement("img");
+    f.src="https://upload.wikimedia.org/wikipedia/commons/3/32/Sunflower_seeds.jpg";
+    f.className="food";
+    f.style.left=Math.random()*260+"px";
+    f.style.top=Math.random()*160+"px";
+
+    f.onclick=()=>{
+      f.remove();
+      score++;
+      document.getElementById("feedScore").textContent=score;
+      if(score>=5){hunger+=40;alert("満腹！");endFeed();update()}
+    };
+
     area.appendChild(f);
   }
 }
@@ -127,11 +149,25 @@ function endFeed(){switchScreen('main')}
 // --- 掃除 ---
 function startClean(){switchScreen('cleanScreen');spawnDirt()}
 function spawnDirt(){
-  const area=document.getElementById("cleanGameArea"); area.innerHTML="";
+  const area=document.getElementById("cleanGameArea");
+  area.innerHTML="";
+
   for(let i=0;i<8;i++){
-    let d=document.createElement("div");d.className="dirt";
-    d.style.left=Math.random()*260+"px";d.style.top=Math.random()*160+"px";
-    d.onclick=()=>{d.remove(); if(area.children.length===0){clean+=40;alert("ピカピカ！");endClean();update()}}
+    let d=document.createElement("div");
+    d.className="dirt";
+    d.style.left=Math.random()*260+"px";
+    d.style.top=Math.random()*160+"px";
+
+    d.onclick=()=>{
+      d.remove();
+      if(area.children.length===0){
+        clean+=40;
+        alert("ピカピカ！");
+        endClean();
+        update();
+      }
+    };
+
     area.appendChild(d);
   }
 }
