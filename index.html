@@ -3,16 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ハムスターお世話ゲーム（リアル画像版）</title>
+<title>ハムスターお世話ゲーム（修正版）</title>
 <style>
 body{font-family:sans-serif;text-align:center;background:#fff4e6}
 h1{background:#f7c59f;padding:10px}
 .hidden{display:none}
 
-/* ハムスター画像 */
-#hamster img{
+/* 画像が表示されない場合の保険 */
+.hamster-img{
   width:180px;
-  transition:0.3s;
 }
 
 .bar{width:200px;height:20px;background:#ddd;margin:5px auto;border-radius:10px;overflow:hidden}
@@ -36,7 +35,9 @@ button{margin:5px;padding:10px 15px;border:none;border-radius:10px;background:#f
 <!-- メイン -->
 <div id="main">
 <div id="hamster">
-<img id="hamImg" src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Golden_hamster.jpg">
+<img id="hamImg" class="hamster-img" 
+ src="https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=400"
+ onerror="this.src='https://via.placeholder.com/180?text=Hamster'">
 </div>
 
 <div>おなか<div class="bar"><div id="hunger" class="fill"></div></div></div>
@@ -52,7 +53,8 @@ button{margin:5px;padding:10px 15px;border:none;border-radius:10px;background:#f
 <div id="walk" class="hidden">
 <h2>ジャンプで障害物回避！</h2>
 <div id="walkGameArea">
-<img id="player" src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Golden_hamster.jpg">
+<img id="player" src="https://images.unsplash.com/photo-1548767797-d8c844163c4c?w=100"
+ onerror="this.src='https://via.placeholder.com/40'">
 </div>
 <button onclick="endWalk()">戻る</button>
 </div>
@@ -128,9 +130,9 @@ function spawnFood(){
   area.innerHTML="";
 
   for(let i=0;i<5;i++){
-    let f=document.createElement("img");
-    f.src="https://upload.wikimedia.org/wikipedia/commons/3/32/Sunflower_seeds.jpg";
+    let f=document.createElement("div");
     f.className="food";
+    f.style.background="orange";
     f.style.left=Math.random()*260+"px";
     f.style.top=Math.random()*160+"px";
 
