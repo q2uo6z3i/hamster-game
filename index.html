@@ -3,161 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ハムスターお世話ゲーム（画面切替）</title>
+<title>ハムスターお世話ゲーム（完成版）</title>
 <style>
-body { font-family: sans-serif; text-align: center; background: #fff4e6; }
-h1 { background: #f7c59f; padding: 10px; }
-.hidden { display:none; }
+body{font-family:sans-serif;text-align:center;background:#fff4e6}
+h1{background:#f7c59f;padding:10px}
+.hidden{display:none}
 
-#hamster {
-  width: 150px; height:150px; background:#f5c6a5; border-radius:50%; margin:20px auto; position:relative;
-}
-.eye { width:15px; height:15px; background:black; border-radius:50%; position:absolute; top:50px; }
-#eye1{ left:40px;} #eye2{ right:40px;}
-#mouth { width:40px;height:20px; position:absolute; bottom:40px; left:50%; transform:translateX(-50%); border-bottom:4px solid black; }
+/* ゴールデンハムスター風 */
+#hamster{width:160px;height:140px;background:#f5c6a5;border-radius:80px;margin:20px auto;position:relative}
+.ear{width:40px;height:40px;background:#f5c6a5;border-radius:50%;position:absolute;top:-15px}
+#ear1{left:20px} #ear2{right:20px}
+.eye{width:12px;height:12px;background:black;border-radius:50%;position:absolute;top:50px}
+#eye1{left:45px} #eye2{right:45px}
+.nose{width:10px;height:8px;background:pink;border-radius:50%;position:absolute;top:65px;left:50%;transform:translateX(-50%)}
+.mouth{width:30px;height:15px;border-bottom:3px solid black;border-radius:0 0 30px 30px;position:absolute;top:75px;left:50%;transform:translateX(-50%)}
+.cheek{width:20px;height:15px;background:#ffd1dc;border-radius:50%;position:absolute;top:70px}
+#c1{left:25px} #c2{right:25px}
 
-.bar { width:200px;height:20px;background:#ddd;margin:5px auto;border-radius:10px;overflow:hidden; }
-.fill{ height:100%; background:#2a9d8f; width:50%; }
-button{ margin:5px;padding:10px 15px;border:none;border-radius:10px;background:#f4a261;color:white;cursor:pointer; }
+.bar{width:200px;height:20px;background:#ddd;margin:5px auto;border-radius:10px;overflow:hidden}
+.fill{height:100%;background:#2a9d8f;width:50%}
+button{margin:5px;padding:10px 15px;border:none;border-radius:10px;background:#f4a261;color:white;cursor:pointer}
 
-#walkGameArea{
-  width:300px;height:200px;margin:20px auto;background:#cdeffd;position:relative;overflow:hidden;border-radius:10px;
-}
-#player{
-  width:30px;height:30px;background:#ff8c42;border-radius:50%;position:absolute;bottom:10px;left:20px;
-}
-.obstacle{
-  width:20px;height:40px;background:#444;position:absolute;bottom:0;
-}
+#walkGameArea,#feedGameArea,#cleanGameArea{width:300px;height:200px;margin:20px auto;border-radius:10px;position:relative;overflow:hidden}
+#walkGameArea{background:#cdeffd}
+#feedGameArea{background:#fff0c9}
+#cleanGameArea{background:#e0ffe0}
+
+#player{width:30px;height:30px;background:#ff8c42;border-radius:50%;position:absolute;bottom:10px;left:20px}
+.obstacle{width:20px;height:40px;background:#444;position:absolute;bottom:0}
+.food{width:20px;height:20px;background:green;border-radius:50%;position:absolute}
+.dirt{width:15px;height:15px;background:brown;border-radius:50%;position:absolute}
 </style>
 </head>
 <body>
-
 <h1>🐹 ハムスターお世話ゲーム 🐹</h1>
 
-<!-- メイン画面 -->
+<!-- メイン -->
 <div id="main">
-  <div id="hamster">
-    <div id="eye1" class="eye"></div>
-    <div id="eye2" class="eye"></div>
-    <div id="mouth"></div>
-  </div>
-
-  <div>おなか<div class="bar"><div id="hunger" class="fill"></div></div></div>
-  <div>きれいさ<div class="bar"><div id="clean" class="fill"></div></div></div>
-  <div>たのしさ<div class="bar"><div id="fun" class="fill"></div></div></div>
-
-  <button onclick="startWalk()">散歩</button>
+<div id="hamster">
+<div id="ear1" class="ear"></div><div id="ear2" class="ear"></div>
+<div id="eye1" class="eye"></div><div id="eye2" class="eye"></div>
+<div class="nose"></div><div id="mouth" class="mouth"></div>
+<div id="c1" class="cheek"></div><div id="c2" class="cheek"></div>
 </div>
 
-<!-- 散歩ゲーム画面 -->
+<div>おなか<div class="bar"><div id="hunger" class="fill"></div></div></div>
+<div>きれいさ<div class="bar"><div id="clean" class="fill"></div></div></div>
+<div>たのしさ<div class="bar"><div id="fun" class="fill"></div></div></div>
+
+<button onclick="startFeed()">餌やり</button>
+<button onclick="startClean()">掃除</button>
+<button onclick="startWalk()">散歩</button>
+</div>
+
+<!-- 散歩 -->
 <div id="walk" class="hidden">
-  <h2>散歩ゲーム（ジャンプで障害物をよけろ！）</h2>
-  <div id="walkGameArea">
-    <div id="player"></div>
-  </div>
-  <p>クリックでジャンプ！</p>
-  <button onclick="endWalk()">戻る</button>
+<h2>ジャンプで障害物回避！</h2>
+<div id="walkGameArea"><div id="player"></div></div>
+<button onclick="endWalk()">戻る</button>
+</div>
+
+<!-- 餌やり -->
+<div id="feed" class="hidden">
+<h2>餌をクリックで集めろ！</h2>
+<div id="feedGameArea"></div>
+<p id="feedScore">0</p>
+<button onclick="endFeed()">戻る</button>
+</div>
+
+<!-- 掃除 -->
+<div id="cleanScreen" class="hidden">
+<h2>汚れを全部クリック！</h2>
+<div id="cleanGameArea"></div>
+<button onclick="endClean()">戻る</button>
 </div>
 
 <script>
-let hunger=50, clean=50, fun=50;
-let jumping=false;
-
+let hunger=50,clean=50,fun=50;
 function update(){
+  hunger=Math.max(0,Math.min(100,hunger));
+  clean=Math.max(0,Math.min(100,clean));
+  fun=Math.max(0,Math.min(100,fun));
+  hungerBar(); face();
+}
+function hungerBar(){
   document.getElementById("hunger").style.width=hunger+"%";
   document.getElementById("clean").style.width=clean+"%";
   document.getElementById("fun").style.width=fun+"%";
+}
+function face(){
+  const m=document.getElementById("mouth");
+  if(hunger>70&&clean>70&&fun>70){m.style.borderBottom="3px solid black";m.style.borderTop="none"}
+  else if(hunger<30||clean<30||fun<30){m.style.borderBottom="none";m.style.borderTop="3px solid black"}
+  else{m.style.borderTop="none";m.style.borderBottom="2px solid black"}
+}
 
-  const mouth=document.getElementById("mouth");
-  if(hunger>70 && clean>70 && fun>70){
-    mouth.style.borderBottom="4px solid black";
-    mouth.style.borderTop="none";
-  }else if(hunger<30 || clean<30 || fun<30){
-    mouth.style.borderBottom="none";
-    mouth.style.borderTop="4px solid black";
-  }else{
-    mouth.style.borderTop="none";
-    mouth.style.borderBottom="2px solid black";
+// --- 散歩 ---
+function startWalk(){switchScreen('walk'); startWalkGame()}
+function endWalk(){switchScreen('main')}
+function startWalkGame(){
+  const p=document.getElementById("player"); let jumping=false;
+  document.getElementById("walkGameArea").onclick=()=>{
+    if(jumping)return; jumping=true; let h=0;
+    let up=setInterval(()=>{if(h>80){clearInterval(up);let down=setInterval(()=>{if(h<=0){clearInterval(down);jumping=false}h-=5;p.style.bottom=10+h+"px"},20)}h+=5;p.style.bottom=10+h+"px"},20)
+  };
+  setTimeout(()=>{fun+=40;alert("成功！");endWalk();update()},5000)
+}
+
+// --- 餌やり ---
+let score=0;
+function startFeed(){switchScreen('feed');score=0;spawnFood()}
+function spawnFood(){
+  const area=document.getElementById("feedGameArea"); area.innerHTML="";
+  for(let i=0;i<5;i++){
+    let f=document.createElement("div");f.className="food";
+    f.style.left=Math.random()*260+"px";f.style.top=Math.random()*160+"px";
+    f.onclick=()=>{f.remove();score++;document.getElementById("feedScore").textContent=score;if(score>=5){hunger+=40;alert("満腹！");endFeed();update()}}
+    area.appendChild(f);
   }
 }
+function endFeed(){switchScreen('main')}
 
-function startWalk(){
+// --- 掃除 ---
+function startClean(){switchScreen('cleanScreen');spawnDirt()}
+function spawnDirt(){
+  const area=document.getElementById("cleanGameArea"); area.innerHTML="";
+  for(let i=0;i<8;i++){
+    let d=document.createElement("div");d.className="dirt";
+    d.style.left=Math.random()*260+"px";d.style.top=Math.random()*160+"px";
+    d.onclick=()=>{d.remove(); if(area.children.length===0){clean+=40;alert("ピカピカ！");endClean();update()}}
+    area.appendChild(d);
+  }
+}
+function endClean(){switchScreen('main')}
+
+function switchScreen(id){
   document.getElementById("main").classList.add("hidden");
-  document.getElementById("walk").classList.remove("hidden");
-  startGame();
-}
-
-function endWalk(){
   document.getElementById("walk").classList.add("hidden");
-  document.getElementById("main").classList.remove("hidden");
+  document.getElementById("feed").classList.add("hidden");
+  document.getElementById("cleanScreen").classList.add("hidden");
+  document.getElementById(id).classList.remove("hidden");
 }
 
-// 散歩ゲーム（横スクロールジャンプ）
-function startGame(){
-  const area=document.getElementById("walkGameArea");
-  const player=document.getElementById("player");
-
-  area.onclick=()=>jump(player);
-
-  let obstacle=setInterval(()=>{
-    let obs=document.createElement("div");
-    obs.classList.add("obstacle");
-    obs.style.left="300px";
-    area.appendChild(obs);
-
-    let move=setInterval(()=>{
-      let x=parseInt(obs.style.left);
-      obs.style.left=(x-5)+"px";
-
-      // 当たり判定
-      let playerTop=player.offsetTop;
-      if(x<50 && x>20 && playerTop>140){
-        clearInterval(move);
-        clearInterval(obstacle);
-        alert("ぶつかった！散歩失敗");
-        area.innerHTML='<div id="player"></div>';
-      }
-
-      if(x<0){
-        obs.remove();
-      }
-    },30);
-
-  },1500);
-
-  // 一定時間で成功
-  setTimeout(()=>{
-    clearInterval(obstacle);
-    fun+=40;
-    alert("散歩成功！楽しかった！");
-    endWalk();
-    update();
-  },8000);
-}
-
-function jump(player){
-  if(jumping) return;
-  jumping=true;
-  let height=0;
-
-  let up=setInterval(()=>{
-    if(height>=80){ clearInterval(up);
-      let down=setInterval(()=>{
-        if(height<=0){ clearInterval(down); jumping=false; }
-        height-=5;
-        player.style.bottom=10+height+"px";
-      },20);
-    }
-    height+=5;
-    player.style.bottom=10+height+"px";
-  },20);
-}
-
-function decrease(){ hunger-=1; clean-=1; fun-=1; update(); }
-setInterval(decrease,1000);
+setInterval(()=>{hunger-=1;clean-=1;fun-=1;update()},1000);
 update();
 </script>
-
 </body>
 </html>
